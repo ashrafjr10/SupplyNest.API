@@ -3,6 +3,9 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/SupplyNest.API.iml" filepath="$PROJECT_DIR$/.idea/SupplyNest.API.iml" />
+      <module fileurl="file://$PROJECT_DIR$/supplyNest-auth-service/supplyNest-auth-service.iml" filepath="$PROJECT_DIR$/supplyNest-auth-service/supplyNest-auth-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/supplyNest-business-service/supplyNest-business-service.iml" filepath="$PROJECT_DIR$/supplyNest-business-service/supplyNest-business-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/supplyNest-notification-service/supplyNest-notification-service.iml" filepath="$PROJECT_DIR$/supplyNest-notification-service/supplyNest-notification-service.iml" />
     </modules>
   </component>
 </project>

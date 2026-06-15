@@ -8,15 +8,15 @@
         <outputRelativeToContentRoot value="true" />
         <module name="supplyNest-registry-server" />
       </profile>
-      <profile name="Annotation profile for supplyNest-notification-service" enabled="true">
+      <profile name="Annotation profile for supplyNest--order-service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.46/lombok-1.18.46.jar" />
         </processorPath>
-        <module name="supplyNest-business-service" />
         <module name="supplyNest-Catalog-Service" />
+        <module name="supplyNest-business-service" />
         <module name="supplyNest--order-service" />
         <module name="supplyNest-auth-service" />
         <module name="supplyNest-api-gateway" />
