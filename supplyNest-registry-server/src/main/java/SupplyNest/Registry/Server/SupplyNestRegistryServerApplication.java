@@ -1,0 +1,15 @@
+package SupplyNest.Registry.Server;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;
+
+@SpringBootApplication
+@EnableEurekaServer
+public class SupplyNestRegistryServerApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(SupplyNestRegistryServerApplication.class, args);
+	}
+
+}
