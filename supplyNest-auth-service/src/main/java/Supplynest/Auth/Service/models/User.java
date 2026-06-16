@@ -51,6 +51,8 @@ public class User extends BaseEntity{
     @JoinColumn(name = "role_id")
     private Role role;
 
+    private UUID businessId;
+
     private Boolean enabled;
 
     private Boolean accountNonLocked;

@@ -30,6 +30,9 @@ public class Business extends BaseEntity{
     @Size(max = 60, min = 3, message = "Business Name should be between 3 and 60 characters")
     private String businessName;
 
+    @NotBlank(message = "Business Code is required")
+    private String businessCode;
+
     @NotNull(message = "Type is required")
     @Enumerated(EnumType.STRING)
     private modelEnums.BusinessType type;
@@ -40,6 +43,9 @@ public class Business extends BaseEntity{
     @NotNull(message = "Status is required")
     @Enumerated(EnumType.STRING)
     private modelEnums.BusinessStatus status;
+
+    @NotNull(message = "user is required")
+    private UUID userId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "business_group_id", nullable = false)

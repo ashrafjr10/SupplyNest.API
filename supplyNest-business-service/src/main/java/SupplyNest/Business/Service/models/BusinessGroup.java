@@ -31,6 +31,9 @@ public class BusinessGroup extends BaseEntity{
     @Size(max = 60, min = 3, message = "Business Group Name should be between 3 and 60 characters")
     private String BusinessGroupName;
 
+    @NotBlank(message = "Business Group Code is required")
+    private String businessGroupCode;
+
     @Pattern(regexp = RegexPatterns.REGEX_DESCRIPTION, message = "wrong description format")
     @Size(max = 250, min = 3, message = "Description should be between 3 and 250 characters")
     private String description;

@@ -43,4 +43,15 @@ public class modelEnums {
             return values();
         }
     }
+
+    public enum  CrudOperation {
+        CREATE,
+        READ,
+        UPDATE,
+        DELETE;
+
+        public static CrudOperation[] getAllValues() {
+            return values();
+        }
+    }
 }
