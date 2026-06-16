@@ -42,4 +42,5 @@ public final class RegexPatterns {
     public static final String REGEX_USERNAME = "^[a-zA-Z0-9._]+@[0-9]{11}$\n";
     public static final String REGEX_PHONE_EMAIL_USERNAME = "^(?:[6789]\\d{9}|[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}|[A-Z0-9_]+@[0-9]{11})$\n";
     public static final String REGEX_DEFAULT_PARENT = "^(?i)(father|mother|guardian)$";
+    public static final String REGEX_GSTIN = "^\\d{2}[A-Z]{5}\\d{4}[A-Z][A-Z0-9]Z[A-Z0-9]$";
 }
