@@ -6,6 +6,9 @@ import org.springframework.context.annotation.Configuration;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+import io.swagger.v3.oas.models.servers.Server;
+
+import java.util.List;
 
 @Configuration
 public class SwaggerConfig {
@@ -16,6 +19,7 @@ public class SwaggerConfig {
         final String securitySchemeName = "bearerAuth";
 
         return new OpenAPI()
+                .servers(List.of(new Server().url("/")))
                 .addSecurityItem(
                         new SecurityRequirement()
                                 .addList(securitySchemeName))
