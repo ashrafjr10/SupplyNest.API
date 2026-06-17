@@ -84,7 +84,7 @@ public class JwtUtils {
         Claims claims = extractAllClaims(token);
 
         return UserDO.builder()
-                .userId(UUID.ofEpochMillis(Long.parseLong(claims.getSubject())))
+                .userId(UUID.fromString(claims.getSubject()))
                 .phoneOrEmail(claims.get("phoneOrEmail", String.class))
                 .userType(claims.get("userType", String.class))
                 .businessCode(claims.get("businessCode", String.class))
