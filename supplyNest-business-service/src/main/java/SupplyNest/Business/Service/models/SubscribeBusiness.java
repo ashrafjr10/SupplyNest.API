@@ -21,9 +21,12 @@ public class SubscribeBusiness extends BaseEntity{
     @GeneratedValue(strategy = GenerationType.UUID)
     public UUID subscribeBusinessId;
 
-    @NotNull(message = "Business Id is required")
-    private UUID businessId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "business_id")
+    private Business business;
 
-    @NotNull(message = "Customer Id is required")
-    private UUID customerId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "customer_id")
+    private Business customer;
+
 }

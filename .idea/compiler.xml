@@ -9,21 +9,24 @@
         <outputRelativeToContentRoot value="true" />
         <module name="supplyNest-registry-server" />
       </profile>
-      <profile name="Annotation profile for supplyNest-api-gateway" enabled="true">
+      <profile name="Annotation profile for supplyNest-business-service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.46/lombok-1.18.46.jar" />
         </processorPath>
-        <module name="supplyNest-Catalog-Service" />
         <module name="supplyNest-business-service" />
+        <module name="supplyNest-Catalog-Service" />
         <module name="supplyNest--order-service" />
         <module name="supplyNest-auth-service" />
         <module name="supplyNest-api-gateway" />
         <module name="supplyNest-notification-service" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="SupplyNest" target="25" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
