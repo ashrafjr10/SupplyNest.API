@@ -1,26 +1,33 @@
-package SupplyNest.Business.Service.models;
+package Supplynest.Auth.Service.dtos;
 
-import SupplyNest.Business.Service.constants.RegexPatterns;
-import jakarta.persistence.*;
+import Supplynest.Auth.Service.constants.RegexPatterns;
+import Supplynest.Auth.Service.enums.modelEnums;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import lombok.*;
-
-import java.util.UUID;
+import lombok.Getter;
+import lombok.Setter;
 
 @Setter
 @Getter
-@AllArgsConstructor
-@NoArgsConstructor
-@Entity
-@Builder
-@Table(name = "business_address")
-public class BusinessAddress extends BaseEntity {
+public class CreateBusinessRequestDTO {
+    @NotBlank(message = "Business Name is required")
+    @Pattern(regexp = RegexPatterns.REGEX_LETTERS_AND_SPACES, message = "Business Name should contain only alphabets and spaces")
+    @Size(max = 60, min = 3, message = "Business Name should be between 3 and 60 characters")
+    private String businessName;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID businessAddressId;
+    @NotBlank(message = "Business Code is required")
+    private String businessCode;
+
+    @NotNull(message = "Type is required")
+    @Enumerated(EnumType.STRING)
+    private modelEnums.BusinessType type;
+
+    @Pattern(regexp = RegexPatterns.REGEX_GSTIN, message = "GST number should be in valid format")
+    private String gstNumber;
 
     @NotBlank(message = "Address is required")
     @Pattern(regexp = RegexPatterns.REGEX_ADDRESS, message = "wrong address format")

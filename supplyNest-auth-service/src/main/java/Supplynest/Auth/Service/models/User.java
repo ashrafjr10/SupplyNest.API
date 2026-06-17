@@ -60,4 +60,6 @@ public class User extends BaseEntity{
     private Boolean emailVerified;
 
     private Boolean mobileVerified;
+
+    private String refreshToken;
 }

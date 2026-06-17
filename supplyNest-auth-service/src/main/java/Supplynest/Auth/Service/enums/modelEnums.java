@@ -54,4 +54,34 @@ public class modelEnums {
             return values();
         }
     }
+
+    public enum BusinessStatus{
+        ACTIVE,
+        INACTIVE,
+        SUSPENDED;
+
+        public static BusinessStatus[] getAllValues() {
+            return values();
+        }
+    }
+
+    public enum BusinessType {
+        DISTRIBUTOR,
+        WHOLESALER,
+        MANUFACTURER,
+        RETAILER;
+
+        public static BusinessType[] getAllValues(){
+            return values();
+        }
+    }
+
+    //------ Login status ------
+    public enum LoginStatus {
+        SUCCESS,
+        FAILED,
+        LOGOUT;
+
+        public static LoginStatus[] getAllValues(){ return  values();}
+    }
 }

@@ -41,7 +41,7 @@ public class JwtUtils {
 
     public String generateAccessToken(
             String phoneOrEmail,
-            Long userId,
+            UUID userId,
             String userType,
             String businessGroupCode,
             String businessCode) {

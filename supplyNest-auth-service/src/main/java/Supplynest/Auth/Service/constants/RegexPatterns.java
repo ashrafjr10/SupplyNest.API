@@ -1,12 +1,14 @@
 package Supplynest.Auth.Service.constants;
 
 public final class RegexPatterns {
+
     private RegexPatterns(){}
 
     public static final String REGEX_EMAIL = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
     public static final String REGEX_PHONE = "^[6789]\\d{9}$";
     public static final String REGEX_PASSWORD = "^(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*()_+{}\\[\\]:;<>,.?~\\\\/\\-]).{8,20}$";
     public static final String REGEX_EMPTY = "^$";
+    public static final String REGEX_GSTIN = "^\\d{2}[A-Z]{5}\\d{4}[A-Z][A-Z0-9]Z[A-Z0-9]$";
     public static final String REGEX_VEHICLE_NUMBER = "^[A-Z]{2}[0-9]{2}([A-Z]{1,2})?[0-9]{4}$";
     public static final String REGEX_OTP = "^\\d{6}$";
     public static final String REGEX_LETTERS_AND_SPACES = "^[a-zA-Z ]+$";
