@@ -1,7 +1,7 @@
-package Supplynest.Auth.Service.dtos;
+package SupplyNest.Business.Service.dtos;
 
-import Supplynest.Auth.Service.constants.RegexPatterns;
-import Supplynest.Auth.Service.enums.modelEnums;
+import SupplyNest.Business.Service.constants.RegexPatterns;
+import SupplyNest.Business.Service.enums.modelEnums;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotBlank;

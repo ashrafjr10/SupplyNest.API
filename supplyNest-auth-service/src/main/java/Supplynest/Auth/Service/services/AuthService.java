@@ -1,6 +1,7 @@
 package Supplynest.Auth.Service.services;
 
 import Supplynest.Auth.Service.constants.AppConstants;
+import Supplynest.Auth.Service.controllers.BusinessGroupClient;
 import Supplynest.Auth.Service.dtos.CommonResponse;
 import Supplynest.Auth.Service.dtos.LoginRequest;
 import Supplynest.Auth.Service.dtos.RegisterRequest;
@@ -16,6 +17,7 @@ import Supplynest.Auth.Service.utils.RequestUtils;
 import Supplynest.Auth.Service.utils.RoleFormatterForUI;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -27,14 +29,15 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AuthService {
 
-    private static UserRepository userRepository;
-    private static RoleRepository roleRepository;
-    private static PasswordEncoder passwordEncoder;
-    private static JwtUtils jwtUtils;
-    private static RoleFormatterForUI roleFormatterForUI;
-    private static UserLogsRepository userLogsRepository;
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final JwtUtils jwtUtils;
+    private final PasswordEncoder passwordEncoder;
+    private final RoleFormatterForUI roleFormatterForUI;
+    private final UserLogsRepository userLogsRepository;
+    private final BusinessGroupClient businessGroupClient;
 
-    public static CommonResponse login(LoginRequest loginRequest, HttpServletRequest httpServletRequest) {
+    public CommonResponse login(LoginRequest loginRequest, HttpServletRequest httpServletRequest) {
 
         String ipAddress = RequestUtils.getClientIp(httpServletRequest);
         String userAgent = RequestUtils.getUserAgent(httpServletRequest);
@@ -74,7 +77,14 @@ public class AuthService {
         return CommonResponse.builder().status(AppConstants.STATUS_SUCCESS).message("Login Successful").data(data).build();
     }
 
-    public static CommonResponse register(RegisterRequest registerRequest) {
+    public CommonResponse register(RegisterRequest registerRequest) {
+
+        if (!registerRequest.getEmail().isEmpty() && userRepository.existsByEmail(registerRequest.getEmail()))
+            return CommonResponse.builder().message(String.format(AppConstants.MESSAGE_EXISTS, "Email")).status(AppConstants.STATUS_CONFLICT).build();
+
+        if (!registerRequest.getMobileNumber().isEmpty() && userRepository.existsByMobileNumber(registerRequest.getMobileNumber()))
+            return CommonResponse.builder().message(String.format(AppConstants.MESSAGE_EXISTS, "Mobile Number")).status(AppConstants.STATUS_CONFLICT).build();
+
         Optional<Role> roleOptional = roleRepository.findById(registerRequest.getRoleId());
         if (roleOptional.isEmpty()) {
             return CommonResponse.builder().message(String.format(AppConstants.NOT_FOUND, "Role")).status(AppConstants.STATUS_NOT_FOUND).build();
@@ -91,12 +101,16 @@ public class AuthService {
                 .build();
         user.prePersist();
 
-        userRepository.save(user);
+        user = userRepository.save(user);
+
+        registerRequest.getCreateBusinessGroupRequestDTO().setUserId(user.getUserId());
+
+        ResponseEntity<?> response = businessGroupClient.createBusinessGroup(registerRequest.getCreateBusinessGroupRequestDTO());
 
         return CommonResponse.builder().status(AppConstants.STATUS_SUCCESS).message("User Registered Successfully").build();
     }
 
-    private static void logLogin(User user, modelEnums.LoginStatus status,
+    private void logLogin(User user, modelEnums.LoginStatus status,
                                  String reason, String ip, String device, String browser) {
 
         UserLogs log = UserLogs.builder()

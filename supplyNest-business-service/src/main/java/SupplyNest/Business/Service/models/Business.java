@@ -44,9 +44,6 @@ public class Business extends BaseEntity{
     @Enumerated(EnumType.STRING)
     private modelEnums.BusinessStatus status;
 
-    @NotNull(message = "user is required")
-    private UUID userId;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "business_group_id", nullable = false)
     private BusinessGroup businessGroup;

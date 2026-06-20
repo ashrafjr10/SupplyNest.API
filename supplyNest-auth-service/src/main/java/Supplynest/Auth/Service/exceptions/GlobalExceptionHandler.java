@@ -101,12 +101,23 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     // Handle all other exceptions
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<CommonResponse> handleAllExceptions(Exception ex, WebRequest request) {
-        logger.error("UnhandledException | {} | {} | {}", request.getDescription(false), ex.getClass().getSimpleName(), ex.getMessage());
+    public ResponseEntity<CommonResponse> handleAllExceptions(
+            Exception ex,
+            WebRequest request) {
+
+        Throwable root = ex;
+        while (root.getCause() != null) {
+            root = root.getCause();
+        }
+
+        logger.error("ROOT CAUSE: {}", root.getMessage(), ex);
+
         CommonResponse error = new CommonResponse(
                 AppConstants.STATUS_INTERNAL_SERVER_ERROR,
-                AppConstants.MESSAGE_INTERNAL_SERVER_ERROR, null
+                root.getMessage(),
+                null
         );
+
         return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

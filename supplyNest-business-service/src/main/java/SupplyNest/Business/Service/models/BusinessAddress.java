@@ -22,10 +22,19 @@ public class BusinessAddress extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID businessAddressId;
 
-    @NotBlank(message = "Address is required")
+    @NotBlank(message = "Address line 1 is required")
     @Pattern(regexp = RegexPatterns.REGEX_ADDRESS, message = "wrong address format")
     @Size(max = 250, min = 3, message = "Address should be between 3 and 250 characters")
-    private String address;
+    private String addressLine1;
+
+    @Pattern(regexp = RegexPatterns.REGEX_ADDRESS, message = "wrong address format")
+    @Size(max = 250, min = 3, message = "Address should be between 3 and 250 characters")
+    private String addressLine2;
+
+//    @NotBlank(message = "Address is required")
+//    @Pattern(regexp = RegexPatterns.REGEX_ADDRESS, message = "wrong address format")
+//    @Size(max = 250, min = 3, message = "Address should be between 3 and 250 characters")
+//    private String address;
 
     @NotBlank(message = "City is required")
     @Pattern(regexp = RegexPatterns.REGEX_LETTERS_AND_SPACES, message = "City should contain only alphabets and spaces")

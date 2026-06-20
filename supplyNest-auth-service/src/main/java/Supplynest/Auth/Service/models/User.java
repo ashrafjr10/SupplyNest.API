@@ -43,7 +43,6 @@ public class User extends BaseEntity{
     private String mobileNumber;
 
     @NotBlank(message = "Password is required")
-    @Pattern(regexp = RegexPatterns.REGEX_PASSWORD, message = AppConstants.VALIDATION_PASSWORD)
     @JsonIgnore
     private String password;
 

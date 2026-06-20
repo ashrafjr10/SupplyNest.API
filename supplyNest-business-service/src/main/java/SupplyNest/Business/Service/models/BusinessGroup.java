@@ -26,17 +26,15 @@ public class BusinessGroup extends BaseEntity{
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID businessGroupId;
 
-//    @NotBlank(message = "Business Group Name is required")
-//    @Pattern(regexp = RegexPatterns.REGEX_LETTERS_AND_SPACES, message = "Business Group Name should contain only alphabets and spaces")
-//    @Size(max = 60, min = 3, message = "Business Group Name should be between 3 and 60 characters")
-//    private String BusinessGroupName;
+    @NotBlank(message = "first name is required")
+    @Pattern(regexp = RegexPatterns.REGEX_LETTERS_AND_SPACES, message = "first name should contain only alphabets and spaces")
+    private String firstName;
+
+    @Pattern(regexp = RegexPatterns.REGEX_LETTERS_AND_SPACES, message = "Last name should contain only alphabets and spaces")
+    private String lastName;
 
     @NotBlank(message = "Business Group Code is required")
     private String businessGroupCode;
-
-//    @Pattern(regexp = RegexPatterns.REGEX_DESCRIPTION, message = "wrong description format")
-//    @Size(max = 250, min = 3, message = "Description should be between 3 and 250 characters")
-//    private String description;
 
     @NotNull(message = "Status is required")
     @Enumerated(EnumType.STRING)
@@ -51,6 +49,9 @@ public class BusinessGroup extends BaseEntity{
     @Pattern(regexp = RegexPatterns.REGEX_EMAIL, message = "Email should be in valid format")
     @Size(max = 100, min = 3, message = "Email should be between 3 and 100 characters")
     private String email;
+
+    @NotNull(message = "user is required")
+    private UUID userId;
 
     @OneToMany(mappedBy = "businessGroup", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Business> businessList = new ArrayList<>();
