@@ -7,10 +7,11 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 
-@FeignClient(name = "business-group-service")
+@FeignClient(name = "SUPPLYNEST-BUSINESS-SERVICE")
 public interface BusinessGroupClient {
 
-    @PostMapping("/create")
-    public ResponseEntity<?> createBusinessGroup(@RequestBody @Valid CreateBusinessGroupRequestDTO request);
+    @PostMapping("/supplynest/business-group/create")
+    ResponseEntity<?> createBusinessGroup(@RequestBody @Valid CreateBusinessGroupRequestDTO request);
 }

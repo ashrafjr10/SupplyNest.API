@@ -1,9 +1,6 @@
 package Supplynest.Auth.Service.controllers;
 
-import Supplynest.Auth.Service.dtos.CommonResponse;
-import Supplynest.Auth.Service.dtos.LoginRequest;
-import Supplynest.Auth.Service.dtos.RegisterRequest;
-import Supplynest.Auth.Service.dtos.UserDO;
+import Supplynest.Auth.Service.dtos.*;
 import Supplynest.Auth.Service.services.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +23,12 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest, HttpServletRequest httpServletRequest) {
         CommonResponse response = authService.login(loginRequest, httpServletRequest);
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
+
+    @PostMapping("/create-user")
+    public ResponseEntity<?> login(@RequestBody CreateUserDTO createUser, HttpServletRequest httpServletRequest) {
+        CommonResponse response = authService.createUser(createUser, httpServletRequest);
         return ResponseEntity.status(response.getStatus()).body(response);
     }
 }

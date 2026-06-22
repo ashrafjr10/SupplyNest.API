@@ -53,6 +53,7 @@ public class BusinessGroup extends BaseEntity{
     @NotNull(message = "user is required")
     private UUID userId;
 
+    @Builder.Default
     @OneToMany(mappedBy = "businessGroup", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Business> businessList = new ArrayList<>();
 

@@ -3,6 +3,7 @@ package Supplynest.Auth.Service.services;
 import Supplynest.Auth.Service.constants.AppConstants;
 import Supplynest.Auth.Service.controllers.BusinessGroupClient;
 import Supplynest.Auth.Service.dtos.CommonResponse;
+import Supplynest.Auth.Service.dtos.CreateUserDTO;
 import Supplynest.Auth.Service.dtos.LoginRequest;
 import Supplynest.Auth.Service.dtos.RegisterRequest;
 import Supplynest.Auth.Service.enums.modelEnums;
@@ -16,6 +17,7 @@ import Supplynest.Auth.Service.utils.JwtUtils;
 import Supplynest.Auth.Service.utils.RequestUtils;
 import Supplynest.Auth.Service.utils.RoleFormatterForUI;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -77,6 +79,7 @@ public class AuthService {
         return CommonResponse.builder().status(AppConstants.STATUS_SUCCESS).message("Login Successful").data(data).build();
     }
 
+    @Transactional
     public CommonResponse register(RegisterRequest registerRequest) {
 
         if (!registerRequest.getEmail().isEmpty() && userRepository.existsByEmail(registerRequest.getEmail()))
@@ -123,5 +126,33 @@ public class AuthService {
                 .build();
 
         userLogsRepository.save(log);
+    }
+
+    public CommonResponse createUser(CreateUserDTO registerRequest, HttpServletRequest httpServletRequest) {
+        if (!registerRequest.getEmail().isEmpty() && userRepository.existsByEmail(registerRequest.getEmail()))
+            return CommonResponse.builder().message(String.format(AppConstants.MESSAGE_EXISTS, "Email")).status(AppConstants.STATUS_CONFLICT).build();
+
+        if (!registerRequest.getMobileNumber().isEmpty() && userRepository.existsByMobileNumber(registerRequest.getMobileNumber()))
+            return CommonResponse.builder().message(String.format(AppConstants.MESSAGE_EXISTS, "Mobile Number")).status(AppConstants.STATUS_CONFLICT).build();
+
+        Optional<Role> roleOptional = roleRepository.findById(registerRequest.getRoleId());
+        if (roleOptional.isEmpty()) {
+            return CommonResponse.builder().message(String.format(AppConstants.NOT_FOUND, "Role")).status(AppConstants.STATUS_NOT_FOUND).build();
+        }
+        Role role = roleOptional.get();
+
+        User user = User.builder()
+                .email(registerRequest.getEmail())
+                .mobileNumber(registerRequest.getMobileNumber())
+                .firstName(registerRequest.getName())
+                .lastName(registerRequest.getName())
+                .password(passwordEncoder.encode(registerRequest.getPassword()))
+                .role(role)
+                .build();
+        user.prePersist();
+
+        userRepository.save(user);
+
+        return CommonResponse.builder().status(AppConstants.STATUS_SUCCESS).build();
     }
 }

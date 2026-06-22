@@ -48,7 +48,7 @@ public class Business extends BaseEntity{
     @JoinColumn(name = "business_group_id", nullable = false)
     private BusinessGroup businessGroup;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "business_address_id")
     private BusinessAddress businessAddress;
 
