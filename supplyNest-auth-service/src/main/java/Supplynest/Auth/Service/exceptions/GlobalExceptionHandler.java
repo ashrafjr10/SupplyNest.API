@@ -1,7 +1,7 @@
 package Supplynest.Auth.Service.exceptions;
 
+import SupplyNest.Common.dtos.CommonResponse;
 import Supplynest.Auth.Service.constants.AppConstants;
-import Supplynest.Auth.Service.dtos.CommonResponse;
 import org.hibernate.service.spi.ServiceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

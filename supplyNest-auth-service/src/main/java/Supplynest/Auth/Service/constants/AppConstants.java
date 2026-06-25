@@ -35,6 +35,7 @@ public final class AppConstants {
     public static final String MESSAGE_FORBIDDEN = "You do not have permission to access this resource.";
     public static final String MESSAGE_NOT_FOUND = "The requested resource was not found.";
     public static final String MESSAGE_CONFLICT = "A conflict occurred with the existing resource.";
+    public static final String MESSAGE_INVALID_TOKEN = "Invalid token.";
     public static final String MESSAGE_BAD_REQUEST = "Invalid request data.";
     public static final String MESSAGE_INTERNAL_SERVER_ERROR = "An internal server error occurred.";
     public static final String MESSAGE_REQUIRED = "ALL FIELDS ARE REQUIRED";

@@ -1,6 +1,5 @@
 package Supplynest.Auth.Service.controllers;
 
-import Supplynest.Auth.Service.dtos.CommonResponse;
 import Supplynest.Auth.Service.dtos.CreateBusinessGroupRequestDTO;
 import jakarta.validation.Valid;
 import org.springframework.cloud.openfeign.FeignClient;

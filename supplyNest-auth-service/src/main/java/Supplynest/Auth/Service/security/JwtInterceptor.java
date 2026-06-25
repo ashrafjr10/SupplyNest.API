@@ -1,5 +1,6 @@
 package Supplynest.Auth.Service.security;
 
+import SupplyNest.Common.CurrentUser;
 import Supplynest.Auth.Service.constants.RequestAttributes;
 import Supplynest.Auth.Service.dtos.UserDO;
 import Supplynest.Auth.Service.models.User;
@@ -37,13 +38,8 @@ public class JwtInterceptor implements HandlerInterceptor {
             return false;
         }
 
-        UserDO userData = jwtUtils.getUserDataFromToken(token);
-
-        User user = userRepository.findById(userData.getUserId()).orElseThrow(() ->
-                        new RuntimeException("User not found"));
-
-        userData.setRole(roleFormatterForUI.formatRole(user.getRole()));
-        request.setAttribute(RequestAttributes.CURRENT_USER, userData);
+        CurrentUser currentUser = jwtUtils.getUserDataFromToken(token);
+        request.setAttribute(RequestAttributes.CURRENT_USER, currentUser);
 
         return true;
     }

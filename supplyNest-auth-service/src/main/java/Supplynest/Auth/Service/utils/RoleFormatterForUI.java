@@ -1,7 +1,7 @@
 package Supplynest.Auth.Service.utils;
 
-import Supplynest.Auth.Service.dtos.RoleCrudePermissionResponseDTO;
-import Supplynest.Auth.Service.dtos.RoleResponseDTO;
+import SupplyNest.Common.dtos.RoleCrudePermissionResponseDTO;
+import SupplyNest.Common.dtos.RoleResponseDTO;
 import Supplynest.Auth.Service.models.Role;
 import Supplynest.Auth.Service.models.RoleCrudPermission;
 import org.springframework.stereotype.Component;

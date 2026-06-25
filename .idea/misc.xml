@@ -11,6 +11,7 @@
         <option value="$PROJECT_DIR$/supplyNest-registry-server/pom.xml" />
         <option value="$PROJECT_DIR$/supplyNest-business-service/pom.xml" />
         <option value="$PROJECT_DIR$/supplyNest-notification-service/pom.xml" />
+        <option value="$PROJECT_DIR$/supplynest-common/pom.xml" />
       </list>
     </option>
   </component>

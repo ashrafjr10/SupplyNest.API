@@ -14,7 +14,7 @@ public class UserDO {
     private UUID userId;
     private String phoneOrEmail;
     private String userType;
-    private RoleResponseDTO role;
+//    private RoleResponseDTO role;
     private String businessCode;
     private String businessGroupCode;
 }

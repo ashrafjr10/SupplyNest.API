@@ -1,4 +1,4 @@
-package Supplynest.Auth.Service.dtos;
+package SupplyNest.Common.dtos;
 
 import lombok.*;
 

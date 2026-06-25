@@ -1,12 +1,15 @@
 package Supplynest.Auth.Service.utils;
 
+import SupplyNest.Common.CurrentUser;
 import Supplynest.Auth.Service.dtos.UserDO;
+import Supplynest.Auth.Service.models.Role;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -19,6 +22,7 @@ import java.util.UUID;
 
 @Component
 @Getter
+@RequiredArgsConstructor
 public class JwtUtils {
 
     @Value("${jwt.secret}")
@@ -31,6 +35,7 @@ public class JwtUtils {
     private long refreshTokenExpiration;
 
     private SecretKey jwtSecretKey;
+    private final RoleFormatterForUI roleFormatterForUI;
 
     @PostConstruct
     public void init() {
@@ -44,13 +49,15 @@ public class JwtUtils {
             UUID userId,
             String userType,
             String businessGroupCode,
-            String businessCode) {
+            String businessCode,
+            Role role) {
 
         Map<String, Object> claims = new HashMap<>();
         claims.put("phoneOrEmail", phoneOrEmail);
         claims.put("userType", userType);
         claims.put("businessCode", businessCode);
         claims.put("businessGroupCode", businessGroupCode);
+        claims.put("role", roleFormatterForUI.formatRole(role));
 
         return Jwts.builder()
                 .claims(claims)
@@ -63,12 +70,14 @@ public class JwtUtils {
 
     public String generateRefreshToken(
             String phoneOrEmail,
-            String businessCode
+            String businessCode,
+            Role role
     ) {
 
         Map<String, Object> claims = new HashMap<>();
         claims.put("phoneOrEmail", phoneOrEmail);
         claims.put("businessCode", businessCode);
+        claims.put("role", roleFormatterForUI.formatRole(role));
 
         return Jwts.builder()
                 .claims(claims)
@@ -79,16 +88,17 @@ public class JwtUtils {
                 .compact();
     }
 
-    public UserDO getUserDataFromToken(String token) {
+    public CurrentUser getUserDataFromToken(String token) {
 
         Claims claims = extractAllClaims(token);
 
-        return UserDO.builder()
+        return CurrentUser.builder()
                 .userId(UUID.fromString(claims.getSubject()))
                 .phoneOrEmail(claims.get("phoneOrEmail", String.class))
                 .userType(claims.get("userType", String.class))
                 .businessCode(claims.get("businessCode", String.class))
                 .businessGroupCode(claims.get("businessGroupCode", String.class))
+                .role(roleFormatterForUI.formatRole(claims.get("role", Role.class)))
                 .build();
     }
 

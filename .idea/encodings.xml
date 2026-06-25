@@ -8,5 +8,6 @@
     <file url="file://$PROJECT_DIR$/supplyNest-notification-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/supplyNest-order-service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/supplyNest-registry-server/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/supplynest-common/src/main/java" charset="UTF-8" />
   </component>
 </project>

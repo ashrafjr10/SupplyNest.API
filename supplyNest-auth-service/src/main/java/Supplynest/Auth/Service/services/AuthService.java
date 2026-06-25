@@ -1,11 +1,10 @@
 package Supplynest.Auth.Service.services;
 
+import SupplyNest.Common.dtos.CommonResponse;
+import SupplyNest.Common.dtos.TokenValidationResponse;
 import Supplynest.Auth.Service.constants.AppConstants;
 import Supplynest.Auth.Service.controllers.BusinessGroupClient;
-import Supplynest.Auth.Service.dtos.CommonResponse;
-import Supplynest.Auth.Service.dtos.CreateUserDTO;
-import Supplynest.Auth.Service.dtos.LoginRequest;
-import Supplynest.Auth.Service.dtos.RegisterRequest;
+import Supplynest.Auth.Service.dtos.*;
 import Supplynest.Auth.Service.enums.modelEnums;
 import Supplynest.Auth.Service.models.Role;
 import Supplynest.Auth.Service.models.User;
@@ -48,17 +47,19 @@ public class AuthService {
 
         Optional<User> userOptional = userRepository.findByMobileNumberOrEmail(loginRequest.getPhoneOrEmail());
         if (userOptional.isEmpty()) {
+            System.out.println("Login failed: User not found for phoneOrEmail: " + loginRequest.getPhoneOrEmail());
             return CommonResponse.builder().message(AppConstants.MESSAGE_INVALID_CREDENTIALS).status(AppConstants.STATUS_NOT_FOUND).build();
         }
         User user = userOptional.get();
 
         if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
+            System.out.println("Login failed: Password mismatch for user: " + user.getMobileNumber() + " / " + user.getEmail());
             logLogin(user, modelEnums.LoginStatus.FAILED, AppConstants.MESSAGE_PASSWORD_DO_NOT_MATCH, ipAddress, device, browser);
             return CommonResponse.builder().message(AppConstants.MESSAGE_INVALID_CREDENTIALS).status(AppConstants.STATUS_UNAUTHORIZED).build();
         }
 
-        String accessToken = jwtUtils.generateAccessToken(loginRequest.getPhoneOrEmail(), user.getUserId(), null, null, null);
-        String refreshToken = jwtUtils.generateRefreshToken(loginRequest.getPhoneOrEmail(), null);
+        String accessToken = jwtUtils.generateAccessToken(loginRequest.getPhoneOrEmail(), user.getUserId(), null, null, null, user.getRole());
+        String refreshToken = jwtUtils.generateRefreshToken(loginRequest.getPhoneOrEmail(), null, user.getRole());
 
         user.setRefreshToken(refreshToken);
         userRepository.save(user);
@@ -154,5 +155,9 @@ public class AuthService {
         userRepository.save(user);
 
         return CommonResponse.builder().status(AppConstants.STATUS_SUCCESS).build();
+    }
+
+    public TokenValidationResponse validateToken(String token) {
+        return TokenValidationResponse.builder().isValid(jwtUtils.validateToken(token)).user(jwtUtils.getUserDataFromToken(token)).build();
     }
 }
