@@ -60,5 +60,6 @@ public class User extends BaseEntity{
 
     private Boolean mobileVerified;
 
+    @Column(length = 2048)
     private String refreshToken;
 }

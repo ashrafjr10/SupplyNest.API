@@ -1,8 +1,10 @@
 package Supplynest.Auth.Service.utils;
 
 import SupplyNest.Common.CurrentUser;
+import SupplyNest.Common.dtos.RoleResponseDTO;
 import Supplynest.Auth.Service.dtos.UserDO;
 import Supplynest.Auth.Service.models.Role;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -10,6 +12,7 @@ import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -24,6 +27,9 @@ import java.util.UUID;
 @Getter
 @RequiredArgsConstructor
 public class JwtUtils {
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Value("${jwt.secret}")
     private String jwtSecret;
@@ -92,13 +98,17 @@ public class JwtUtils {
 
         Claims claims = extractAllClaims(token);
 
+        Map<String, Object> roleMap = claims.get("role", Map.class);
+
+        RoleResponseDTO role = objectMapper.convertValue(roleMap, RoleResponseDTO.class);
+
         return CurrentUser.builder()
                 .userId(UUID.fromString(claims.getSubject()))
                 .phoneOrEmail(claims.get("phoneOrEmail", String.class))
                 .userType(claims.get("userType", String.class))
                 .businessCode(claims.get("businessCode", String.class))
                 .businessGroupCode(claims.get("businessGroupCode", String.class))
-                .role(roleFormatterForUI.formatRole(claims.get("role", Role.class)))
+                .role(role)
                 .build();
     }
 

@@ -31,6 +31,6 @@ public class BusinessGroupController {
         String userId = request.getHeader("X-User-Id");
         String role = request.getHeader("X-Role");
 
-        return ResponseEntity.ok(userId);
+        return ResponseEntity.ok(request);
     }
 }
