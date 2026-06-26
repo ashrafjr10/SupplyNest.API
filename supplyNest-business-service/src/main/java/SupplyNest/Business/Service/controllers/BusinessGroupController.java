@@ -2,6 +2,7 @@ package SupplyNest.Business.Service.controllers;
 
 import SupplyNest.Business.Service.dtos.CreateBusinessGroupRequestDTO;
 import SupplyNest.Business.Service.dtos.CreateBusinessRequestDTO;
+import SupplyNest.Business.Service.dtos.UpdateBusinessGroupRequestDTO;
 import SupplyNest.Business.Service.services.BusinessGroupService;
 import SupplyNest.Common.dtos.CommonResponse;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,11 +26,17 @@ public class BusinessGroupController {
         return ResponseEntity.status(response.getStatus()).body(response);
     }
 
-    @PostMapping("/{businessGroupCode}/business/create")
-    public ResponseEntity<?> createBusiness(@RequestBody @Valid CreateBusinessRequestDTO requestDTO,
-                                            @PathVariable("businessGroupCode") String businessGroupCode,
-                                            HttpServletRequest servletRequest) {
-        CommonResponse response = businessGroupService.createBusiness(requestDTO, businessGroupCode, servletRequest);
+    @PostMapping("/{businessGroupCode}/update")
+    public ResponseEntity<?> updateBusinessGroup(@RequestBody @Valid UpdateBusinessGroupRequestDTO requestDTO,
+                                                 @PathVariable("businessGroupCode") String businessGroupCode,
+                                                 HttpServletRequest servletRequest) {
+        CommonResponse response = businessGroupService.updateBusinessGroup(requestDTO, businessGroupCode, servletRequest);
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
+
+    @GetMapping("/{businessGroupCode}")
+    public ResponseEntity<?> getBusinessGroups(@PathVariable("businessGroupCode") String businessGroupCode, HttpServletRequest request) {
+        CommonResponse response = businessGroupService.getBusinessGroups(businessGroupCode, request);
         return ResponseEntity.status(response.getStatus()).body(response);
     }
 
@@ -41,12 +48,28 @@ public class BusinessGroupController {
         return ResponseEntity.status(response.getStatus()).body(response);
     }
 
-    @GetMapping("/test")
-    public ResponseEntity<?> test(HttpServletRequest request) {
+    @PostMapping("/{businessGroupCode}/business/create")
+    public ResponseEntity<?> createBusiness(@RequestBody @Valid CreateBusinessRequestDTO requestDTO,
+                                            @PathVariable("businessGroupCode") String businessGroupCode,
+                                            HttpServletRequest servletRequest) {
+        CommonResponse response = businessGroupService.createBusiness(requestDTO, businessGroupCode, servletRequest);
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
 
-        String userId = request.getHeader("X-User-Id");
-        String role = request.getHeader("X-Role");
+    @PutMapping("/{businessGroupCode}/business/{businessCode}/update")
+    public ResponseEntity<?> updateBusiness(@RequestBody @Valid CreateBusinessRequestDTO requestDTO,
+                                            @PathVariable("businessGroupCode") String businessGroupCode,
+                                            @PathVariable("businessCode") String businessCode,
+                                            HttpServletRequest httpServletRequest){
+        CommonResponse response = businessGroupService.updateBusiness(requestDTO, businessGroupCode, businessCode, httpServletRequest);
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
 
-        return ResponseEntity.ok(request);
+    @GetMapping("/{businessGroupCode}/business/{businessCode}")
+    public ResponseEntity<?> getBusiness(@PathVariable("businessGroupCode") String businessGroupCode,
+                                         @PathVariable("businessCode") String businessCode,
+                                         HttpServletRequest httpServletRequest){
+        CommonResponse response = businessGroupService.getBusiness(businessGroupCode, businessCode, httpServletRequest);
+        return ResponseEntity.status(response.getStatus()).body(response);
     }
 }

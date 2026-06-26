@@ -13,6 +13,9 @@ import SupplyNest.Business.Service.utils.Codes;
 import SupplyNest.Common.constants.AppConstants;
 import SupplyNest.Common.constants.HeaderConstants;
 import SupplyNest.Common.dtos.CommonResponse;
+import SupplyNest.Common.dtos.RoleResponseDTO;
+import SupplyNest.Common.enums.ModelEnums;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -31,6 +34,7 @@ public class BusinessGroupService {
     private final BusinessGroupRepository businessGroupRepository;
     private final BusinessRepository businessRepository;
     private final UserClient userClient;
+    private final ObjectMapper objectMapper;
 
     @Transactional
     public CommonResponse createBusinessGroup(@Valid CreateBusinessGroupRequestDTO request) {
@@ -80,6 +84,53 @@ public class BusinessGroupService {
         return CommonResponse.builder().status(AppConstants.STATUS_SUCCESS).message(AppConstants.MESSAGE_SUCCESS).build();
     }
 
+    public CommonResponse updateBusinessGroup(@Valid UpdateBusinessGroupRequestDTO requestDTO, String businessGroupCode, HttpServletRequest servletRequest) {
+        CommonResponse userResponse = validateUser(servletRequest);
+        if (userResponse.getStatus() != AppConstants.STATUS_SUCCESS) {
+            return userResponse;
+        }
+
+        Optional<BusinessGroup> businessGroupOptional = businessGroupRepository.findByBusinessGroupCode(businessGroupCode);
+        if (businessGroupOptional.isEmpty()) {
+            return CommonResponse.builder().status(AppConstants.STATUS_BAD_REQUEST).message(String.format(AppConstants.NOT_FOUND, "business group")).build();
+        }
+        BusinessGroup businessGroup = businessGroupOptional.get();
+
+        if (!businessGroup.getBusinessGroupCode().equals(servletRequest.getHeader(HeaderConstants.BUSINESS_GROUP_CODE)))
+            return CommonResponse.builder().status(AppConstants.STATUS_UNAUTHORIZED).message(AppConstants.MESSAGE_UNAUTHORIZED).build();
+
+        businessGroup.setFirstName(requestDTO.getFirstName());
+        businessGroup.setLastName(requestDTO.getLastName());
+        businessGroup.setEmail(requestDTO.getEmail());
+        businessGroup.setPhoneNumber(requestDTO.getMobileNumber());
+
+        businessGroupRepository.save(businessGroup);
+
+        return CommonResponse.builder().status(AppConstants.STATUS_SUCCESS).message(AppConstants.MESSAGE_SUCCESS).build();
+    }
+
+    public CommonResponse getBusinessGroups(String businessGroupCode, HttpServletRequest servletRequest) {
+        CommonResponse userResponse = validateUser(servletRequest);
+        if (userResponse.getStatus() != AppConstants.STATUS_SUCCESS) {
+            return userResponse;
+        }
+
+        Optional<BusinessGroup> businessGroupOptional = businessGroupRepository.findByBusinessGroupCode(businessGroupCode);
+        if (businessGroupOptional.isEmpty()) {
+            return CommonResponse.builder().status(AppConstants.STATUS_BAD_REQUEST).message(String.format(AppConstants.NOT_FOUND, "business group")).build();
+        }
+        BusinessGroup businessGroup = businessGroupOptional.get();
+
+//        RoleResponseDTO role = objectMapper.convertValue(servletRequest.getAttribute(HeaderConstants.ROLE), RoleResponseDTO.class);
+//        if (!businessGroup.getBusinessGroupCode().equals(servletRequest.getHeader(HeaderConstants.BUSINESS_GROUP_CODE))
+//                || !role.getType().equals(ModelEnums.RoleTypes.SUPER_ADMIN.name()))
+//            return CommonResponse.builder().status(AppConstants.STATUS_UNAUTHORIZED).message(AppConstants.MESSAGE_UNAUTHORIZED).build();
+
+        BusinessGroupResponseDTO responseDTO = getBusinessGroupResponseDTO(businessGroup);
+
+        return CommonResponse.builder().status(AppConstants.STATUS_SUCCESS).message(AppConstants.MESSAGE_SUCCESS).data(responseDTO).build();
+    }
+
     public CommonResponse createBusiness(@Valid CreateBusinessRequestDTO request, String businessGroupCode, HttpServletRequest servletRequest) {
         CommonResponse userResponse = validateUser(servletRequest);
         if (userResponse.getStatus() != AppConstants.STATUS_SUCCESS) {
@@ -119,6 +170,69 @@ public class BusinessGroupService {
         businessRepository.save(business);
 
         return CommonResponse.builder().status(AppConstants.STATUS_SUCCESS).message(AppConstants.MESSAGE_SUCCESS).build();
+    }
+
+    public CommonResponse updateBusiness(@Valid CreateBusinessRequestDTO requestDTO, String businessGroupCode, String businessCode, HttpServletRequest servletRequest) {
+        CommonResponse userResponse = validateUser(servletRequest);
+        if (userResponse.getStatus() != AppConstants.STATUS_SUCCESS) {
+            return userResponse;
+        }
+
+        Optional<BusinessGroup> businessGroupOptional = businessGroupRepository.findByBusinessGroupCode(businessGroupCode);
+        if (businessGroupOptional.isEmpty()) {
+            return CommonResponse.builder().status(AppConstants.STATUS_BAD_REQUEST).message(String.format(AppConstants.NOT_FOUND, "business group")).build();
+        }
+        BusinessGroup businessGroup = businessGroupOptional.get();
+
+        Optional<Business> businessOptional = businessRepository.findByBusinessCode(businessCode);
+        if (businessOptional.isEmpty()) {
+            return CommonResponse.builder().status(AppConstants.STATUS_BAD_REQUEST).message(String.format(AppConstants.NOT_FOUND, "business")).build();
+        }
+        Business business = businessOptional.get();
+
+        if (!business.getBusinessCode().equals(servletRequest.getHeader(HeaderConstants.BUSINESS_CODE)))
+            return CommonResponse.builder().status(AppConstants.STATUS_UNAUTHORIZED).message(AppConstants.MESSAGE_UNAUTHORIZED).build();
+
+        BusinessAddress businessAddress = business.getBusinessAddress();
+        businessAddress.setAddressLine1(requestDTO.getAddressLine1());
+        businessAddress.setAddressLine2(requestDTO.getAddressLine2());
+        businessAddress.setCity(requestDTO.getCity());
+        businessAddress.setState(requestDTO.getState());
+        businessAddress.setPinCode(requestDTO.getPinCode());
+
+        business.setBusinessName(requestDTO.getBusinessName());
+        business.setGstNumber(requestDTO.getGstNumber());
+        business.setType(requestDTO.getType());
+        business.setBusinessAddress(businessAddress);
+
+        businessRepository.save(business);
+
+        return CommonResponse.builder().status(AppConstants.STATUS_SUCCESS).message(AppConstants.MESSAGE_SUCCESS).build();
+    }
+
+    public CommonResponse getBusiness(String businessGroupCode, String businessCode, HttpServletRequest servletRequest) {
+        CommonResponse userResponse = validateUser(servletRequest);
+        if (userResponse.getStatus() != AppConstants.STATUS_SUCCESS) {
+            return userResponse;
+        }
+
+        Optional<BusinessGroup> businessGroupOptional = businessGroupRepository.findByBusinessGroupCode(businessGroupCode);
+        if (businessGroupOptional.isEmpty()) {
+            return CommonResponse.builder().status(AppConstants.STATUS_BAD_REQUEST).message(String.format(AppConstants.NOT_FOUND, "business group")).build();
+        }
+
+        Optional<Business> businessOptional = businessRepository.findByBusinessCode(businessCode);
+        if (businessOptional.isEmpty()) {
+            return CommonResponse.builder().status(AppConstants.STATUS_BAD_REQUEST).message(String.format(AppConstants.NOT_FOUND, "business")).build();
+        }
+        Business business = businessOptional.get();
+
+        if (!business.getBusinessCode().equals(servletRequest.getHeader(HeaderConstants.BUSINESS_CODE)))
+            return CommonResponse.builder().status(AppConstants.STATUS_UNAUTHORIZED).message(AppConstants.MESSAGE_UNAUTHORIZED).build();
+
+        BusinessResponseDTO businessResponseDTO = getBusinessResponseDTO(business);
+
+        return CommonResponse.builder().status(AppConstants.STATUS_SUCCESS).message(AppConstants.MESSAGE_SUCCESS).data(businessResponseDTO).build();
     }
 
     public CommonResponse getAllBusinessGroups(HttpServletRequest request, int page, int size) {
