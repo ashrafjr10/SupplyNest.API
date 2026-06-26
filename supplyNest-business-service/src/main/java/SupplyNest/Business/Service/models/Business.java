@@ -1,7 +1,7 @@
 package SupplyNest.Business.Service.models;
 
-import SupplyNest.Business.Service.constants.RegexPatterns;
 import SupplyNest.Business.Service.enums.modelEnums;
+import SupplyNest.Common.constants.RegexPatterns;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
