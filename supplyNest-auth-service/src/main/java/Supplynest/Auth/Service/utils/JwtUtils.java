@@ -2,7 +2,6 @@ package Supplynest.Auth.Service.utils;
 
 import SupplyNest.Common.CurrentUser;
 import SupplyNest.Common.dtos.RoleResponseDTO;
-import Supplynest.Auth.Service.dtos.UserDO;
 import Supplynest.Auth.Service.models.Role;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;

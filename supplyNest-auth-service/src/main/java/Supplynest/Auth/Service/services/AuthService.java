@@ -1,8 +1,8 @@
 package Supplynest.Auth.Service.services;
 
+import SupplyNest.Common.constants.AppConstants;
 import SupplyNest.Common.dtos.CommonResponse;
 import SupplyNest.Common.dtos.TokenValidationResponse;
-import Supplynest.Auth.Service.constants.AppConstants;
 import Supplynest.Auth.Service.controllers.BusinessGroupClient;
 import Supplynest.Auth.Service.dtos.*;
 import Supplynest.Auth.Service.enums.modelEnums;

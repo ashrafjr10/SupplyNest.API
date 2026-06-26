@@ -2,8 +2,6 @@ package Supplynest.Auth.Service.security;
 
 import SupplyNest.Common.CurrentUser;
 import Supplynest.Auth.Service.constants.RequestAttributes;
-import Supplynest.Auth.Service.dtos.UserDO;
-import Supplynest.Auth.Service.models.User;
 import Supplynest.Auth.Service.repositories.UserRepository;
 import Supplynest.Auth.Service.utils.JwtUtils;
 import Supplynest.Auth.Service.utils.RoleFormatterForUI;

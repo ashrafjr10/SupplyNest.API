@@ -1,7 +1,7 @@
 package SupplyNest.Business.Service.services;
 
-import SupplyNest.Business.Service.dtos.CommonResponse;
 import SupplyNest.Common.constants.AppConstants;
+import SupplyNest.Common.dtos.CommonResponse;
 import org.hibernate.service.spi.ServiceException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;

@@ -1,13 +1,13 @@
 package SupplyNest.Common.dtos;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
 @Builder
 public class CommonResponse {
+    @NotNull
     private Integer status;
     private String message;
     private Object data;
@@ -15,5 +15,11 @@ public class CommonResponse {
     public CommonResponse(Integer status, String message){
         this.status = status;
         this.message = message;
+    }
+
+    public CommonResponse(Integer status, String message, Object data){
+        this.status = status;
+        this.message = message;
+        this.data = data;
     }
 }

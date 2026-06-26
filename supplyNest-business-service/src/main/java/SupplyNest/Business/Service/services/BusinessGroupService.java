@@ -1,19 +1,28 @@
 package SupplyNest.Business.Service.services;
 
-import SupplyNest.Business.Service.dtos.CommonResponse;
-import SupplyNest.Business.Service.dtos.CreateBusinessGroupRequestDTO;
+import SupplyNest.Business.Service.controllers.UserClient;
+import SupplyNest.Business.Service.dtos.*;
 import SupplyNest.Business.Service.enums.modelEnums;
 import SupplyNest.Business.Service.models.Business;
 import SupplyNest.Business.Service.models.BusinessAddress;
 import SupplyNest.Business.Service.models.BusinessGroup;
+import SupplyNest.Business.Service.models.User;
 import SupplyNest.Business.Service.repositories.BusinessGroupRepository;
 import SupplyNest.Business.Service.repositories.BusinessRepository;
 import SupplyNest.Business.Service.utils.Codes;
 import SupplyNest.Common.constants.AppConstants;
+import SupplyNest.Common.constants.HeaderConstants;
+import SupplyNest.Common.dtos.CommonResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +30,7 @@ public class BusinessGroupService {
 
     private final BusinessGroupRepository businessGroupRepository;
     private final BusinessRepository businessRepository;
+    private final UserClient userClient;
 
     @Transactional
     public CommonResponse createBusinessGroup(@Valid CreateBusinessGroupRequestDTO request) {
@@ -68,5 +78,123 @@ public class BusinessGroupService {
         businessGroupRepository.save(businessGroup);
 
         return CommonResponse.builder().status(AppConstants.STATUS_SUCCESS).message(AppConstants.MESSAGE_SUCCESS).build();
+    }
+
+    public CommonResponse createBusiness(@Valid CreateBusinessRequestDTO request, String businessGroupCode, HttpServletRequest servletRequest) {
+        CommonResponse userResponse = validateUser(servletRequest);
+        if (userResponse.getStatus() != AppConstants.STATUS_SUCCESS) {
+            return userResponse;
+        }
+
+        Optional<BusinessGroup> businessGroupOptional = businessGroupRepository.findByBusinessGroupCode(businessGroupCode);
+        if (businessGroupOptional.isEmpty()) {
+            return CommonResponse.builder().status(AppConstants.STATUS_BAD_REQUEST).message(String.format(AppConstants.NOT_FOUND, "business group")).build();
+        }
+        BusinessGroup businessGroup = businessGroupOptional.get();
+
+        if (!businessGroup.getBusinessGroupCode().equals(servletRequest.getHeader(HeaderConstants.BUSINESS_GROUP_CODE)))
+            return CommonResponse.builder().status(AppConstants.STATUS_UNAUTHORIZED).message(AppConstants.MESSAGE_UNAUTHORIZED).build();
+
+        Business business = Business.builder()
+                .businessName(request.getBusinessName())
+                .type(request.getType())
+                .status(modelEnums.BusinessStatus.ACTIVE)
+                .gstNumber(request.getGstNumber())
+                .businessGroup(businessGroup)
+                .businessAddress(BusinessAddress.builder()
+                        .addressLine1(request.getAddressLine1())
+                        .addressLine2(request.getAddressLine2())
+                        .city(request.getCity())
+                        .state(request.getState())
+                        .pinCode(request.getPinCode())
+                        .build())
+                .build();
+
+        String businessCode = Codes.generateBusinessCode(request.getBusinessName());
+        while (businessRepository.existsByBusinessCode(businessCode)){
+            businessCode = Codes.generateBusinessCode(request.getBusinessName());
+        }
+        business.setBusinessCode(businessCode);
+
+        businessRepository.save(business);
+
+        return CommonResponse.builder().status(AppConstants.STATUS_SUCCESS).message(AppConstants.MESSAGE_SUCCESS).build();
+    }
+
+    public CommonResponse getAllBusinessGroups(HttpServletRequest request, int page, int size) {
+
+        CommonResponse userResponse = validateUser(request);
+        if (userResponse.getStatus() != AppConstants.STATUS_SUCCESS) {
+            return userResponse;
+        }
+
+        if (page < 0) {
+            return CommonResponse.builder().status(AppConstants.STATUS_BAD_REQUEST).message(AppConstants.PAGE_ERROR_INDEX).build();
+        }
+        if (size < 1) {
+            return CommonResponse.builder().status(AppConstants.STATUS_BAD_REQUEST).message(AppConstants.PAGE_ERROR_SIZE).build();
+        }
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<BusinessGroup> businessGroups = businessGroupRepository.findAll(pageable);
+
+        List<BusinessGroupResponseDTO> businessGroupResponseDTOs = businessGroups.getContent().stream()
+                .map(this::getBusinessGroupResponseDTO).toList();
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("page", businessGroups.getTotalPages());
+        response.put("size", businessGroups.getSize());
+        response.put("total", businessGroups.getTotalElements());
+        response.put("data", businessGroupResponseDTOs);
+
+        return CommonResponse.builder().status(AppConstants.STATUS_SUCCESS).message(AppConstants.MESSAGE_SUCCESS).data(response).build();
+    }
+
+    //helper methods
+
+    private BusinessGroupResponseDTO getBusinessGroupResponseDTO(BusinessGroup businessGroup){
+        return BusinessGroupResponseDTO.builder()
+                .businessGroupId(businessGroup.getBusinessGroupId())
+                .firstName(businessGroup.getFirstName())
+                .lastName(businessGroup.getLastName())
+                .businessGroupCode(businessGroup.getBusinessGroupCode())
+                .status(businessGroup.getStatus())
+                .email(businessGroup.getEmail())
+                .phoneNumber(businessGroup.getPhoneNumber())
+                .userId(businessGroup.getUserId())
+                .businesses(businessGroup.getBusinessList().stream().map(this::getBusinessResponseDTO).toList())
+                .build();
+    }
+
+    private BusinessResponseDTO getBusinessResponseDTO(Business business){
+        return BusinessResponseDTO.builder()
+                .businessId(business.getBusinessId())
+                .businessName(business.getBusinessName())
+                .businessCode(business.getBusinessCode())
+                .type(business.getType())
+                .status(business.getStatus())
+                .gstNumber(business.getGstNumber())
+                .businessAddress(BusinessAddressResponseDTO.builder()
+                        .businessAddressId(business.getBusinessAddress().getBusinessAddressId())
+                        .addressLine1(business.getBusinessAddress().getAddressLine1())
+                        .addressLine2(business.getBusinessAddress().getAddressLine2())
+                        .city(business.getBusinessAddress().getCity())
+                        .state(business.getBusinessAddress().getState())
+                        .pinCode(business.getBusinessAddress().getPinCode())
+                        .build())
+                .build();
+    }
+
+    private CommonResponse validateUser(HttpServletRequest request){
+        UUID userId = UUID.fromString(request.getHeader(HeaderConstants.USER_ID));
+        CommonResponse userResponse = userClient.getUser(userId).getBody();
+        if (userResponse.getStatus() != AppConstants.STATUS_SUCCESS) {
+            return userResponse;
+        }
+
+        User user = (User) userResponse.getData();
+
+        return CommonResponse.builder().status(AppConstants.STATUS_SUCCESS).message(AppConstants.MESSAGE_SUCCESS).data(user).build();
     }
 }

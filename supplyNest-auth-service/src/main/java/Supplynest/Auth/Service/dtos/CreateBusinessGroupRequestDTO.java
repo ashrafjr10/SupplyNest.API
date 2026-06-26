@@ -1,6 +1,6 @@
 package Supplynest.Auth.Service.dtos;
 
-import Supplynest.Auth.Service.constants.RegexPatterns;
+import SupplyNest.Common.constants.RegexPatterns;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;

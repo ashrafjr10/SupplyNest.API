@@ -1,6 +1,6 @@
 package Supplynest.Auth.Service.dtos;
 
-import Supplynest.Auth.Service.constants.RegexPatterns;
+import SupplyNest.Common.constants.RegexPatterns;
 import Supplynest.Auth.Service.enums.modelEnums;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;

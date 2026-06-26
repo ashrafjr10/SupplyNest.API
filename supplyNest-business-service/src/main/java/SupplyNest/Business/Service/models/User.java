@@ -1,26 +1,23 @@
-package Supplynest.Auth.Service.models;
+package SupplyNest.Business.Service.models;
 
 import SupplyNest.Common.constants.RegexPatterns;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Entity
-@Table(name = "users")
 @Setter
 @Getter
 @AllArgsConstructor
-@NoArgsConstructor
+@RequiredArgsConstructor
 @Builder
-public class User extends BaseEntity{
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+public class User {
     private UUID userId;
 
     @NotBlank(message = "First name is required")
@@ -45,9 +42,7 @@ public class User extends BaseEntity{
     @JsonIgnore
     private String password;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "role_id")
-    private Role role;
+//    private Role role;
 
     private UUID businessId;
 
