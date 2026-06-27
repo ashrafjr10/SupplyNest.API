@@ -26,6 +26,7 @@ public class Category {
     @Size(max = 100, min = 3, message = "Category name must be between 3 and 100 characters")
     private String categoryName;
 
+    @NotNull(message = "Business ID is required")
     private UUID businessId;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
