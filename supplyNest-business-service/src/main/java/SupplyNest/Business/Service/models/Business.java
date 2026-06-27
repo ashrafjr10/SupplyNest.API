@@ -33,6 +33,8 @@ public class Business extends BaseEntity{
     @NotBlank(message = "Business Code is required")
     private String businessCode;
 
+    private String logo;
+
     @NotNull(message = "Type is required")
     @Enumerated(EnumType.STRING)
     private modelEnums.BusinessType type;

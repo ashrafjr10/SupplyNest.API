@@ -24,6 +24,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 
@@ -35,6 +36,7 @@ public class BusinessGroupService {
     private final BusinessRepository businessRepository;
     private final UserClient userClient;
     private final ObjectMapper objectMapper;
+    private final FileService fileService;
 
     @Transactional
     public CommonResponse createBusinessGroup(@Valid CreateBusinessGroupRequestDTO request) {
@@ -131,6 +133,36 @@ public class BusinessGroupService {
         return CommonResponse.builder().status(AppConstants.STATUS_SUCCESS).message(AppConstants.MESSAGE_SUCCESS).data(responseDTO).build();
     }
 
+    public CommonResponse getAllBusinessGroups(HttpServletRequest request, int page, int size) {
+
+        CommonResponse userResponse = validateUser(request);
+        if (userResponse.getStatus() != AppConstants.STATUS_SUCCESS) {
+            return userResponse;
+        }
+
+        if (page < 0) {
+            return CommonResponse.builder().status(AppConstants.STATUS_BAD_REQUEST).message(AppConstants.PAGE_ERROR_INDEX).build();
+        }
+        if (size < 1) {
+            return CommonResponse.builder().status(AppConstants.STATUS_BAD_REQUEST).message(AppConstants.PAGE_ERROR_SIZE).build();
+        }
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<BusinessGroup> businessGroups = businessGroupRepository.findAll(pageable);
+
+        List<BusinessGroupResponseDTO> businessGroupResponseDTOs = businessGroups.getContent().stream()
+                .map(this::getBusinessGroupResponseDTO).toList();
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("page", businessGroups.getTotalPages());
+        response.put("size", businessGroups.getSize());
+        response.put("total", businessGroups.getTotalElements());
+        response.put("data", businessGroupResponseDTOs);
+
+        return CommonResponse.builder().status(AppConstants.STATUS_SUCCESS).message(AppConstants.MESSAGE_SUCCESS).data(response).build();
+    }
+
     public CommonResponse createBusiness(@Valid CreateBusinessRequestDTO request, String businessGroupCode, HttpServletRequest servletRequest) {
         CommonResponse userResponse = validateUser(servletRequest);
         if (userResponse.getStatus() != AppConstants.STATUS_SUCCESS) {
@@ -210,6 +242,39 @@ public class BusinessGroupService {
         return CommonResponse.builder().status(AppConstants.STATUS_SUCCESS).message(AppConstants.MESSAGE_SUCCESS).build();
     }
 
+
+
+    public CommonResponse updateBusinessLogo(MultipartFile logo, String businessGroupCode, String businessCode, HttpServletRequest servletRequest) {
+        CommonResponse userResponse = validateUser(servletRequest);
+        if (userResponse.getStatus() != AppConstants.STATUS_SUCCESS) {
+            return userResponse;
+        }
+
+        Optional<BusinessGroup> businessGroupOptional = businessGroupRepository.findByBusinessGroupCode(businessGroupCode);
+        if (businessGroupOptional.isEmpty()) {
+            return CommonResponse.builder().status(AppConstants.STATUS_BAD_REQUEST).message(String.format(AppConstants.NOT_FOUND, "business group")).build();
+        }
+
+        Optional<Business> businessOptional = businessRepository.findByBusinessCode(businessCode);
+        if (businessOptional.isEmpty()) {
+            return CommonResponse.builder().status(AppConstants.STATUS_BAD_REQUEST).message(String.format(AppConstants.NOT_FOUND, "business")).build();
+        }
+        Business business = businessOptional.get();
+
+        if (!business.getBusinessCode().equals(servletRequest.getHeader(HeaderConstants.BUSINESS_CODE)))
+            return CommonResponse.builder().status(AppConstants.STATUS_UNAUTHORIZED).message(AppConstants.MESSAGE_UNAUTHORIZED).build();
+
+        try {
+            String initialPath = "business-group/" + businessGroupCode + "/business/" + businessCode + "/logo/";
+            String finalPath = fileService.saveFile(logo, initialPath);
+            business.setLogo(finalPath);
+            businessRepository.save(business);
+            return CommonResponse.builder().status(AppConstants.STATUS_SUCCESS).message(AppConstants.MESSAGE_SUCCESS).build();
+        }catch (Exception e){
+            return CommonResponse.builder().status(AppConstants.STATUS_BAD_REQUEST).message(e.getMessage()).build();
+        }
+    }
+
     public CommonResponse getBusiness(String businessGroupCode, String businessCode, HttpServletRequest servletRequest) {
         CommonResponse userResponse = validateUser(servletRequest);
         if (userResponse.getStatus() != AppConstants.STATUS_SUCCESS) {
@@ -235,34 +300,24 @@ public class BusinessGroupService {
         return CommonResponse.builder().status(AppConstants.STATUS_SUCCESS).message(AppConstants.MESSAGE_SUCCESS).data(businessResponseDTO).build();
     }
 
-    public CommonResponse getAllBusinessGroups(HttpServletRequest request, int page, int size) {
-
-        CommonResponse userResponse = validateUser(request);
+    public CommonResponse getBusinessNames(String businessGroupCode, HttpServletRequest servletRequest) {
+        CommonResponse userResponse = validateUser(servletRequest);
         if (userResponse.getStatus() != AppConstants.STATUS_SUCCESS) {
             return userResponse;
         }
 
-        if (page < 0) {
-            return CommonResponse.builder().status(AppConstants.STATUS_BAD_REQUEST).message(AppConstants.PAGE_ERROR_INDEX).build();
+        Optional<BusinessGroup> businessGroupOptional = businessGroupRepository.findByBusinessGroupCode(businessGroupCode);
+        if (businessGroupOptional.isEmpty()) {
+            return CommonResponse.builder().status(AppConstants.STATUS_BAD_REQUEST).message(String.format(AppConstants.NOT_FOUND, "business group")).build();
         }
-        if (size < 1) {
-            return CommonResponse.builder().status(AppConstants.STATUS_BAD_REQUEST).message(AppConstants.PAGE_ERROR_SIZE).build();
-        }
+        BusinessGroup businessGroup = businessGroupOptional.get();
 
-        Pageable pageable = PageRequest.of(page, size);
+        if (!businessGroup.getBusinessGroupCode().equals(servletRequest.getHeader(HeaderConstants.BUSINESS_GROUP_CODE)))
+            return CommonResponse.builder().status(AppConstants.STATUS_UNAUTHORIZED).message(AppConstants.MESSAGE_UNAUTHORIZED).build();
 
-        Page<BusinessGroup> businessGroups = businessGroupRepository.findAll(pageable);
+        List<String> businessNames = businessGroup.getBusinessList().stream().map(Business::getBusinessName).toList();
 
-        List<BusinessGroupResponseDTO> businessGroupResponseDTOs = businessGroups.getContent().stream()
-                .map(this::getBusinessGroupResponseDTO).toList();
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("page", businessGroups.getTotalPages());
-        response.put("size", businessGroups.getSize());
-        response.put("total", businessGroups.getTotalElements());
-        response.put("data", businessGroupResponseDTOs);
-
-        return CommonResponse.builder().status(AppConstants.STATUS_SUCCESS).message(AppConstants.MESSAGE_SUCCESS).data(response).build();
+        return CommonResponse.builder().status(AppConstants.STATUS_SUCCESS).message(AppConstants.MESSAGE_SUCCESS).data(businessNames).build();
     }
 
     //helper methods

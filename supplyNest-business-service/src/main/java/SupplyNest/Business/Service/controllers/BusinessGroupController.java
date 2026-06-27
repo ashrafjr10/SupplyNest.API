@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -65,11 +66,27 @@ public class BusinessGroupController {
         return ResponseEntity.status(response.getStatus()).body(response);
     }
 
+    @PutMapping("/{businessGroupCode}/business/{businessCode}/update-logo")
+    public ResponseEntity<?> updateBusiness(@RequestParam MultipartFile logo,
+                                            @PathVariable("businessGroupCode") String businessGroupCode,
+                                            @PathVariable("businessCode") String businessCode,
+                                            HttpServletRequest httpServletRequest){
+        CommonResponse response = businessGroupService.updateBusinessLogo(logo, businessGroupCode, businessCode, httpServletRequest);
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
+
     @GetMapping("/{businessGroupCode}/business/{businessCode}")
     public ResponseEntity<?> getBusiness(@PathVariable("businessGroupCode") String businessGroupCode,
                                          @PathVariable("businessCode") String businessCode,
                                          HttpServletRequest httpServletRequest){
         CommonResponse response = businessGroupService.getBusiness(businessGroupCode, businessCode, httpServletRequest);
+        return ResponseEntity.status(response.getStatus()).body(response);
+    }
+
+    @GetMapping("/{businessGroupCode}/business-name")
+    public ResponseEntity<?> getBusinessNames(@PathVariable("businessGroupCode") String businessGroupCode,
+                                              HttpServletRequest httpServletRequest){
+        CommonResponse response = businessGroupService.getBusinessNames(businessGroupCode, httpServletRequest);
         return ResponseEntity.status(response.getStatus()).body(response);
     }
 }
