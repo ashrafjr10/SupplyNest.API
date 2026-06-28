@@ -8,6 +8,7 @@ import SupplyNest.Common.dtos.CommonResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -66,8 +67,8 @@ public class BusinessGroupController {
         return ResponseEntity.status(response.getStatus()).body(response);
     }
 
-    @PutMapping("/{businessGroupCode}/business/{businessCode}/update-logo")
-    public ResponseEntity<?> updateBusiness(@RequestParam MultipartFile logo,
+    @PutMapping(value = "/{businessGroupCode}/business/{businessCode}/update-logo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> updateBusiness(@RequestPart MultipartFile logo,
                                             @PathVariable("businessGroupCode") String businessGroupCode,
                                             @PathVariable("businessCode") String businessCode,
                                             HttpServletRequest httpServletRequest){

@@ -1,6 +1,7 @@
 package SupplyNest.File.Service.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.ContentDisposition;
@@ -9,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
@@ -22,7 +24,15 @@ import java.util.UUID;
 @Service
 public class FileService {
 
-    private final Path uploadRoot = Paths.get("storage/uploads");
+    @Value("${file.upload-dir:storage/uploads}")
+    private String uploadDir;
+
+    private Path uploadRoot;
+
+    @PostConstruct
+    public void init() {
+        uploadRoot = Paths.get(uploadDir).toAbsolutePath().normalize();
+    }
 
     public String saveFile(MultipartFile file, String folder) {
 
@@ -32,11 +42,12 @@ public class FileService {
                 throw new RuntimeException("File is empty");
             }
 
-            Files.createDirectories(uploadRoot);
+            Path root = uploadRoot.toAbsolutePath().normalize();
+            Files.createDirectories(root);
 
-            Path folderPath = uploadRoot.resolve(folder).normalize();
+            Path folderPath = root.resolve(folder).normalize();
 
-            if (!folderPath.startsWith(uploadRoot.toAbsolutePath().normalize())) {
+            if (!folderPath.startsWith(root)) {
                 throw new RuntimeException("Invalid folder path");
             }
 
@@ -54,13 +65,16 @@ public class FileService {
 
             file.transferTo(destination);
 
-            return "uploads/" +
-                    uploadRoot.relativize(destination)
-                            .toString()
-                            .replace("\\", "/");
+            System.out.println("Root       : " + root);
+            System.out.println("Folder     : " + folder);
+            System.out.println("FolderPath : " + folderPath);
 
-        } catch (IOException e) {
-            throw new RuntimeException(e.getMessage());
+            return "uploads/" + root.relativize(destination)
+                    .toString()
+                    .replace("\\", "/");
+
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to save file: " + e.getMessage(), e);
         }
     }
 

@@ -1,5 +1,6 @@
 package SupplyNest.Business.Service.services;
 
+import SupplyNest.Business.Service.controllers.FileClient;
 import SupplyNest.Business.Service.controllers.UserClient;
 import SupplyNest.Business.Service.dtos.*;
 import SupplyNest.Business.Service.enums.modelEnums;
@@ -36,7 +37,7 @@ public class BusinessGroupService {
     private final BusinessRepository businessRepository;
     private final UserClient userClient;
     private final ObjectMapper objectMapper;
-    private final FileService fileService;
+    private final FileClient fileClient;
 
     @Transactional
     public CommonResponse createBusinessGroup(@Valid CreateBusinessGroupRequestDTO request) {
@@ -242,8 +243,6 @@ public class BusinessGroupService {
         return CommonResponse.builder().status(AppConstants.STATUS_SUCCESS).message(AppConstants.MESSAGE_SUCCESS).build();
     }
 
-
-
     public CommonResponse updateBusinessLogo(MultipartFile logo, String businessGroupCode, String businessCode, HttpServletRequest servletRequest) {
         CommonResponse userResponse = validateUser(servletRequest);
         if (userResponse.getStatus() != AppConstants.STATUS_SUCCESS) {
@@ -261,12 +260,12 @@ public class BusinessGroupService {
         }
         Business business = businessOptional.get();
 
-        if (!business.getBusinessCode().equals(servletRequest.getHeader(HeaderConstants.BUSINESS_CODE)))
-            return CommonResponse.builder().status(AppConstants.STATUS_UNAUTHORIZED).message(AppConstants.MESSAGE_UNAUTHORIZED).build();
+//        if (!business.getBusinessCode().equals(servletRequest.getHeader(HeaderConstants.BUSINESS_CODE)))
+//            return CommonResponse.builder().status(AppConstants.STATUS_UNAUTHORIZED).message(AppConstants.MESSAGE_UNAUTHORIZED).build();
 
         try {
-            String initialPath = "business-group/" + businessGroupCode + "/business/" + businessCode + "/logo/";
-            String finalPath = fileService.saveFile(logo, initialPath);
+            String initialPath = businessGroupCode + "/" + businessCode + "/logo/";
+            String finalPath = fileClient.uploadFile(logo, initialPath).getBody();
             business.setLogo(finalPath);
             businessRepository.save(business);
             return CommonResponse.builder().status(AppConstants.STATUS_SUCCESS).message(AppConstants.MESSAGE_SUCCESS).build();
@@ -362,7 +361,7 @@ public class BusinessGroupService {
             return userResponse;
         }
 
-        User user = (User) userResponse.getData();
+        User user = objectMapper.convertValue(userResponse.getData(), User.class);
 
         return CommonResponse.builder().status(AppConstants.STATUS_SUCCESS).message(AppConstants.MESSAGE_SUCCESS).data(user).build();
     }
