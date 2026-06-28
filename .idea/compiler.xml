@@ -9,7 +9,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="supplyNest-registry-server" />
       </profile>
-      <profile name="Annotation profile for supplynest-common" enabled="true">
+      <profile name="Annotation profile for supplyNest-file-service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
@@ -23,6 +23,7 @@
         <module name="supplyNest-business-service" />
         <module name="supplyNest-auth-service" />
         <module name="supplyNest-notification-service" />
+        <module name="supplyNest-file-service" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
@@ -36,6 +37,7 @@
       <module name="supplyNest-api-gateway" options="-parameters" />
       <module name="supplyNest-auth-service" options="-parameters" />
       <module name="supplyNest-business-service" options="-parameters" />
+      <module name="supplyNest-file-service" options="-parameters" />
       <module name="supplyNest-notification-service" options="-parameters" />
       <module name="supplyNest-registry-server" options="-parameters" />
       <module name="supplynest-common" options="-parameters" />

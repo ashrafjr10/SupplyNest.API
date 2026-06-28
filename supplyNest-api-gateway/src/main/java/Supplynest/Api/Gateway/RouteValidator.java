@@ -17,6 +17,8 @@ public class RouteValidator {
             "/eureka",
             "/auth-service/v3/api-docs",
             "/business-service/v3/api-docs",
+            "/file-service/v3/api-docs",
+            "/catalog-service/v3/api-docs",
             "/swagger-ui",
             "/swagger-ui.html",
             "/v3/api-docs"
