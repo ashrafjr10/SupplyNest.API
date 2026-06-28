@@ -1,6 +1,6 @@
 package SupplyNest.Catalog.Service.controllers;
 
-import SupplyNest.Catalog.Service.config.FeignConfig;
+import SupplyNest.Common.config.FeignConfig;
 import SupplyNest.Common.dtos.CommonResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;

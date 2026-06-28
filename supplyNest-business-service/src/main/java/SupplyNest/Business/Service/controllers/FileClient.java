@@ -1,6 +1,6 @@
 package SupplyNest.Business.Service.controllers;
 
-import SupplyNest.Business.Service.config.FeignConfig;
+import SupplyNest.Common.config.FeignConfig;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;

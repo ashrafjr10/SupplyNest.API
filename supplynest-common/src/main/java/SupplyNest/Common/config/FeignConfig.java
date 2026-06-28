@@ -1,4 +1,4 @@
-package SupplyNest.Business.Service.config;
+package SupplyNest.Common.config;
 
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
@@ -41,3 +41,4 @@ public class FeignConfig {
         };
     }
 }
+
