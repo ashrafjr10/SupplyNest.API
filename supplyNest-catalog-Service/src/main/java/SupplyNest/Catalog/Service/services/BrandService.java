@@ -11,6 +11,7 @@ import SupplyNest.Catalog.Service.repositories.BrandRepository;
 import SupplyNest.Common.constants.AppConstants;
 import SupplyNest.Common.constants.HeaderConstants;
 import SupplyNest.Common.dtos.CommonResponse;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ public class BrandService {
     private final BrandRepository brandRepository;
     private final UserClient userClient;
     private final BusinessGroupClient businessGroupClient;
+    private final ObjectMapper objectMapper;
 
     public CommonResponse createBrand(CreateBrandRequestDTO requestDTO, String businessCode, String businessGroupCode, HttpServletRequest httpServletRequest) {
         CommonResponse userResponse = validateUser(httpServletRequest);
@@ -33,11 +35,11 @@ public class BrandService {
             return userResponse;
         }
 
-        CommonResponse businessResponse = businessGroupClient.getBusiness(businessCode, businessGroupCode, httpServletRequest).getBody();
+        CommonResponse businessResponse = businessGroupClient.getBusiness(businessGroupCode, businessCode).getBody();
         if (!businessResponse.getStatus().equals(AppConstants.STATUS_SUCCESS)) {
             return businessResponse;
         }
-        Business business = (Business) businessResponse.getData();
+        Business business = objectMapper.convertValue(businessResponse.getData(), Business.class);
 
         if (!business.getBusinessCode().equals(httpServletRequest.getHeader(HeaderConstants.BUSINESS_CODE)))
             return CommonResponse.builder().status(AppConstants.STATUS_UNAUTHORIZED).message(AppConstants.MESSAGE_UNAUTHORIZED).build();
@@ -58,7 +60,7 @@ public class BrandService {
             return userResponse;
         }
 
-        CommonResponse businessResponse = businessGroupClient.getBusiness(businessCode, businessGroupCode, httpServletRequest).getBody();
+        CommonResponse businessResponse = businessGroupClient.getBusiness(businessGroupCode, businessCode).getBody();
         if (!businessResponse.getStatus().equals(AppConstants.STATUS_SUCCESS)) {
             return businessResponse;
         }
@@ -86,7 +88,7 @@ public class BrandService {
             return userResponse;
         }
 
-        CommonResponse businessResponse = businessGroupClient.getBusiness(businessCode, businessGroupCode, httpServletRequest).getBody();
+        CommonResponse businessResponse = businessGroupClient.getBusiness(businessGroupCode, businessCode).getBody();
         if (!businessResponse.getStatus().equals(AppConstants.STATUS_SUCCESS)) {
             return businessResponse;
         }
@@ -110,7 +112,7 @@ public class BrandService {
             return userResponse;
         }
 
-        CommonResponse businessResponse = businessGroupClient.getBusiness(businessCode, businessGroupCode, httpServletRequest).getBody();
+        CommonResponse businessResponse = businessGroupClient.getBusiness(businessGroupCode, businessCode).getBody();
         if (!businessResponse.getStatus().equals(AppConstants.STATUS_SUCCESS)) {
             return businessResponse;
         }
@@ -131,9 +133,9 @@ public class BrandService {
             return userResponse;
         }
 
-        User user = (User) userResponse.getData();
+//        User user = (User) userResponse.getData();
 
-        return CommonResponse.builder().status(AppConstants.STATUS_SUCCESS).message(AppConstants.MESSAGE_SUCCESS).data(user).build();
+        return CommonResponse.builder().status(AppConstants.STATUS_SUCCESS).message(AppConstants.MESSAGE_SUCCESS).build();
     }
 
     private BrandResponseDTO brandResponseDTO(Brand brand){

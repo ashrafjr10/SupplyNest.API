@@ -33,12 +33,12 @@ public class CategoryService {
             return userResponse;
         }
 
-        CommonResponse businessGroupResponse = businessGroupClient.getBusinessGroups(businessGroupCode, httpServletRequest).getBody();
+        CommonResponse businessGroupResponse = businessGroupClient.getBusinessGroups(businessGroupCode).getBody();
         if (!businessGroupResponse.getStatus().equals(AppConstants.STATUS_SUCCESS)) {
             return businessGroupResponse;
         }
 
-        CommonResponse businessResponse = businessGroupClient.getBusiness(businessCode, businessGroupCode, httpServletRequest).getBody();
+        CommonResponse businessResponse = businessGroupClient.getBusiness(businessGroupCode, businessCode).getBody();
         if (!businessResponse.getStatus().equals(AppConstants.STATUS_SUCCESS)) {
             return businessResponse;
         }
@@ -63,7 +63,7 @@ public class CategoryService {
             return userResponse;
         }
 
-        CommonResponse businessResponse = businessGroupClient.getBusiness(businessCode, businessGroupCode, httpServletRequest).getBody();
+        CommonResponse businessResponse = businessGroupClient.getBusiness(businessGroupCode, businessCode).getBody();
         if (!businessResponse.getStatus().equals(AppConstants.STATUS_SUCCESS)) {
             return businessResponse;
         }
@@ -91,7 +91,7 @@ public class CategoryService {
             return userResponse;
         }
 
-        CommonResponse businessResponse = businessGroupClient.getBusiness(businessCode, businessGroupCode, httpServletRequest).getBody();
+        CommonResponse businessResponse = businessGroupClient.getBusiness(businessGroupCode, businessCode).getBody();
         if (!businessResponse.getStatus().equals(AppConstants.STATUS_SUCCESS)) {
             return businessResponse;
         }
@@ -118,12 +118,12 @@ public class CategoryService {
             return userResponse;
         }
 
-        CommonResponse businessGroupResponse = businessGroupClient.getBusinessGroups(businessGroupCode, httpServletRequest).getBody();
+        CommonResponse businessGroupResponse = businessGroupClient.getBusinessGroups(businessGroupCode).getBody();
         if (!businessGroupResponse.getStatus().equals(AppConstants.STATUS_SUCCESS)) {
             return businessGroupResponse;
         }
 
-        CommonResponse businessResponse = businessGroupClient.getBusiness(businessCode, businessGroupCode, httpServletRequest).getBody();
+        CommonResponse businessResponse = businessGroupClient.getBusiness(businessGroupCode, businessCode).getBody();
         if (!businessResponse.getStatus().equals(AppConstants.STATUS_SUCCESS)) {
             return businessResponse;
         }
@@ -147,12 +147,12 @@ public class CategoryService {
             return userResponse;
         }
 
-        CommonResponse businessGroupResponse = businessGroupClient.getBusinessGroups(businessGroupCode, httpServletRequest).getBody();
+        CommonResponse businessGroupResponse = businessGroupClient.getBusinessGroups(businessGroupCode).getBody();
         if (!businessGroupResponse.getStatus().equals(AppConstants.STATUS_SUCCESS)) {
             return businessGroupResponse;
         }
 
-        CommonResponse businessResponse = businessGroupClient.getBusiness(businessCode, businessGroupCode, httpServletRequest).getBody();
+        CommonResponse businessResponse = businessGroupClient.getBusiness(businessGroupCode, businessCode).getBody();
         if (!businessResponse.getStatus().equals(AppConstants.STATUS_SUCCESS)) {
             return businessResponse;
         }
@@ -174,9 +174,7 @@ public class CategoryService {
             return userResponse;
         }
 
-        User user = (User) userResponse.getData();
-
-        return CommonResponse.builder().status(AppConstants.STATUS_SUCCESS).message(AppConstants.MESSAGE_SUCCESS).data(user).build();
+        return CommonResponse.builder().status(AppConstants.STATUS_SUCCESS).message(AppConstants.MESSAGE_SUCCESS).build();
     }
 
     private CategoryResponseDTO getCategoryResponse(Category category){

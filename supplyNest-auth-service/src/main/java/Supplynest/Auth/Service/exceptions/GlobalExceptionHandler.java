@@ -31,7 +31,8 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<CommonResponse> handleServiceException(ServiceException ex, WebRequest request) {
         CommonResponse error = new CommonResponse(
                 AppConstants.STATUS_BAD_REQUEST,
-                ex.getMessage()
+                ex.getMessage(),
+                null
         );
         logger.error("ServiceException | {} | {}", request.getDescription(false), ex.getMessage());
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
