@@ -6,15 +6,14 @@ import SupplyNest.Common.dtos.TokenValidationResponse;
 import Supplynest.Auth.Service.controllers.BusinessGroupClient;
 import Supplynest.Auth.Service.dtos.*;
 import Supplynest.Auth.Service.enums.modelEnums;
-import Supplynest.Auth.Service.models.Role;
-import Supplynest.Auth.Service.models.User;
-import Supplynest.Auth.Service.models.UserLogs;
+import Supplynest.Auth.Service.models.*;
 import Supplynest.Auth.Service.repositories.RoleRepository;
 import Supplynest.Auth.Service.repositories.UserLogsRepository;
 import Supplynest.Auth.Service.repositories.UserRepository;
 import Supplynest.Auth.Service.utils.JwtUtils;
 import Supplynest.Auth.Service.utils.RequestUtils;
 import Supplynest.Auth.Service.utils.RoleFormatterForUI;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +24,7 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +37,7 @@ public class AuthService {
     private final RoleFormatterForUI roleFormatterForUI;
     private final UserLogsRepository userLogsRepository;
     private final BusinessGroupClient businessGroupClient;
+    private final ObjectMapper objectMapper;
 
     public CommonResponse login(LoginRequest loginRequest, HttpServletRequest httpServletRequest) {
 
@@ -47,19 +48,41 @@ public class AuthService {
 
         Optional<User> userOptional = userRepository.findByMobileNumberOrEmail(loginRequest.getPhoneOrEmail());
         if (userOptional.isEmpty()) {
-            System.out.println("Login failed: User not found for phoneOrEmail: " + loginRequest.getPhoneOrEmail());
             return CommonResponse.builder().message(AppConstants.MESSAGE_INVALID_CREDENTIALS).status(AppConstants.STATUS_NOT_FOUND).build();
         }
         User user = userOptional.get();
 
         if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
-            System.out.println("Login failed: Password mismatch for user: " + user.getMobileNumber() + " / " + user.getEmail());
             logLogin(user, modelEnums.LoginStatus.FAILED, AppConstants.MESSAGE_PASSWORD_DO_NOT_MATCH, ipAddress, device, browser);
             return CommonResponse.builder().message(AppConstants.MESSAGE_INVALID_CREDENTIALS).status(AppConstants.STATUS_UNAUTHORIZED).build();
         }
 
-        String accessToken = jwtUtils.generateAccessToken(loginRequest.getPhoneOrEmail(), user.getUserId(), null, null, null, user.getRole());
-        String refreshToken = jwtUtils.generateRefreshToken(loginRequest.getPhoneOrEmail(), null, user.getRole());
+        Map<String, String> businessList = new HashMap<>();
+        String businessCode = null;
+        String businessGroupCode = null;
+        if (user.getBusinessId() != null){
+            CommonResponse businessResponse = getBusiness(user.getBusinessGroupId());
+            if (businessResponse.getStatus() != AppConstants.STATUS_SUCCESS) {
+                return businessResponse;
+            }
+            businessCode = (String) businessResponse.getData();
+        }else if (user.getBusinessGroupId() != null){
+            CommonResponse businessGroupResponse = getBusinessGroup(user.getBusinessGroupId());
+            if (businessGroupResponse.getStatus() != AppConstants.STATUS_SUCCESS) {
+                return businessGroupResponse;
+            }
+            BusinessGroup businessGroup = (BusinessGroup) businessGroupResponse.getData();
+            businessGroupCode = businessGroup.getBusinessGroupCode();
+
+            if (businessGroup.getBusinessList() != null) {
+                for (Business business : businessGroup.getBusinessList()) {
+                    businessList.put(business.getBusinessName(), business.getBusinessCode());
+                }
+            }
+        }
+
+        String accessToken = jwtUtils.generateAccessToken(loginRequest.getPhoneOrEmail(), user.getUserId(), user.getRole().getRoleTypes().name(), businessGroupCode, businessCode, user.getRole());
+        String refreshToken = jwtUtils.generateRefreshToken(loginRequest.getPhoneOrEmail(), businessCode, user.getRole());
 
         user.setRefreshToken(refreshToken);
         userRepository.save(user);
@@ -68,9 +91,10 @@ public class AuthService {
 
         Map<String, Object> data = new HashMap<>();
         data.put("role", roleFormatterForUI.formatRole(user.getRole()));
-        data.put("userType", null);
-        data.put("businessGroupCode", null);
-        data.put("businessCode", null);
+        data.put("userType", user.getRole().getRoleTypes().name());
+        data.put("businessGroupCode", businessGroupCode);
+        data.put("businessList", businessList);
+        data.put("businessCode", businessCode);
         data.put("phoneOrEmail", loginRequest.getPhoneOrEmail());
         data.put("staffCode", null);
         data.put("subscribed", null);
@@ -112,6 +136,24 @@ public class AuthService {
         ResponseEntity<?> response = businessGroupClient.createBusinessGroup(registerRequest.getCreateBusinessGroupRequestDTO());
 
         return CommonResponse.builder().status(AppConstants.STATUS_SUCCESS).message("User Registered Successfully").build();
+    }
+
+    private CommonResponse getBusinessGroup(UUID businessGroupId){
+        ResponseEntity<CommonResponse> response = businessGroupClient.getBusinessGroupById(businessGroupId);
+        if (response.getBody().getStatus() != AppConstants.STATUS_SUCCESS) {
+            return CommonResponse.builder().message(String.format(AppConstants.NOT_FOUND, "Business Group")).status(AppConstants.STATUS_NOT_FOUND).build();
+        }
+        BusinessGroup businessGroup = objectMapper.convertValue(response.getBody().getData(), BusinessGroup.class);
+        return CommonResponse.builder().status(AppConstants.STATUS_SUCCESS).data(businessGroup).build();
+    }
+
+    private CommonResponse getBusiness(UUID businessId){
+        ResponseEntity<CommonResponse> response = businessGroupClient.getBusinessGroupById(businessId);
+        if (response.getBody().getStatus() != AppConstants.STATUS_SUCCESS) {
+            return CommonResponse.builder().message(String.format(AppConstants.NOT_FOUND, "Business")).status(AppConstants.STATUS_NOT_FOUND).build();
+        }
+        Business business = objectMapper.convertValue(response.getBody().getData(), Business.class);
+        return CommonResponse.builder().status(AppConstants.STATUS_SUCCESS).data(business.getBusinessCode()).build();
     }
 
     private void logLogin(User user, modelEnums.LoginStatus status,

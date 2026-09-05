@@ -41,8 +41,8 @@ public class BrandService {
         }
         Business business = objectMapper.convertValue(businessResponse.getData(), Business.class);
 
-        if (!business.getBusinessCode().equals(httpServletRequest.getHeader(HeaderConstants.BUSINESS_CODE)))
-            return CommonResponse.builder().status(AppConstants.STATUS_UNAUTHORIZED).message(AppConstants.MESSAGE_UNAUTHORIZED).build();
+//        if (!business.getBusinessCode().equals(httpServletRequest.getHeader(HeaderConstants.BUSINESS_CODE)))
+//            return CommonResponse.builder().status(AppConstants.STATUS_UNAUTHORIZED).message(AppConstants.MESSAGE_UNAUTHORIZED).build();
 
         Brand brand = Brand.builder()
                 .brandName(requestDTO.getBrandName())

@@ -2,6 +2,7 @@ package SupplyNest.Catalog.Service.controllers;
 
 import SupplyNest.Common.config.FeignConfig;
 import SupplyNest.Common.dtos.CommonResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,4 +17,9 @@ public interface BusinessGroupClient {
     @GetMapping("/business-group/{businessGroupCode}/business/{businessCode}")
     public ResponseEntity<CommonResponse> getBusiness(@PathVariable("businessGroupCode") String businessGroupCode,
                                                       @PathVariable("businessCode") String businessCode);
+
+    @GetMapping("/business-group/{businessGroupCode}/business/{businessCode}")
+    public ResponseEntity<CommonResponse> getBusiness(@PathVariable("businessGroupCode") String businessGroupCode,
+                                                      @PathVariable("businessCode") String businessCode,
+                                                      HttpServletRequest httpServletRequest);
 }
